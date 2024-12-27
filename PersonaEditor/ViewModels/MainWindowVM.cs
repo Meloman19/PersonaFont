@@ -86,7 +86,7 @@ namespace PersonaEditor.Views
                 SFD.FileName = filename;
 
                 string ext = Path.GetExtension(MultiFile.OpenFileName).Remove(0, 1);
-                SFD.Filter = ext.ToUpper() + "|*." + ext;
+                SFD.Filter = ext.ToUpperInvariant() + "|*." + ext;
 
                 if (SFD.ShowDialog() == true)
                     MultiFile.SaveFile(SFD.FileName);

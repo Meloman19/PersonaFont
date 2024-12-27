@@ -137,7 +137,7 @@ namespace PersonaEditor.Samples
                     if (!fileText.Any())
                         continue;
 
-                    var newRelFilePath = Path.Combine(relDirPath, bmdGF.Name).ToUpper();
+                    var newRelFilePath = Path.Combine(relDirPath, bmdGF.Name).ToUpperInvariant();
                     var newRelDirPath = Path.GetDirectoryName(newRelFilePath);
                     var newFileName = Path.GetFileName(newRelFilePath);
 
@@ -154,13 +154,13 @@ namespace PersonaEditor.Samples
             // now grouping text by directory in single TSV file.
             foreach (var dirPair in allText)
             {
-                var name = dirPair.Key.ToUpper().Replace('\\', '_') + ".tsv";
+                var name = dirPair.Key.ToUpperInvariant().Replace('\\', '_') + ".tsv";
                 var output = Path.Combine(outputDir, name);
 
                 var outputText = dirPair.Value
                     .SelectMany(x =>
                         x.Value.Select(y =>
-                            string.Join('\t', x.Key.ToUpper(), y.Item1, y.Item2, y.Item3)))
+                            string.Join('\t', x.Key.ToUpperInvariant(), y.Item1, y.Item2, y.Item3)))
                     .ToArray();
 
                 File.WriteAllLines(output, outputText);

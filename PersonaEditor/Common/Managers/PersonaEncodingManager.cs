@@ -1,8 +1,8 @@
-﻿using PersonaEditorLib;
-using AuxiliaryLibraries.WPF;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using PersonaEditorLib;
 
 namespace PersonaEditor.Common.Managers
 {
@@ -25,7 +25,7 @@ namespace PersonaEditor.Common.Managers
             {
                 var filelist = Directory.EnumerateFiles(dir);
                 foreach (var file in filelist)
-                    if (Path.GetExtension(file).ToLower() == ".fntmap")
+                    if (Path.GetExtension(file).Equals(".fntmap", StringComparison.InvariantCultureIgnoreCase))
                     {
                         var temp = Path.GetFileNameWithoutExtension(file);
                         if (temp != "Empty")

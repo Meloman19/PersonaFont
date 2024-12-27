@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using PersonaEditor.Common;
 using PersonaEditor.Common.Settings;
@@ -101,7 +102,7 @@ namespace PersonaEditor.ViewModels.Settings
             {
                 var list = Directory.GetFiles(Static.Paths.DirLang);
                 foreach (var file in list)
-                    if (Path.GetExtension(file).ToLower() == ".xml")
+                    if (Path.GetExtension(file).Equals(".xml", StringComparison.InvariantCultureIgnoreCase))
                         LangList.Add(Path.GetFileNameWithoutExtension(file));
             }
         }

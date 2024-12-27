@@ -32,7 +32,7 @@ namespace PersonaEditorLib
             { typeof(PTP),      ".ptp"  },
         };
 
-        private static readonly Dictionary<string, Type> _extensionToType = new Dictionary<string, Type>()
+        private static readonly Dictionary<string, Type> _extensionToType = new Dictionary<string, Type>(StringComparer.InvariantCultureIgnoreCase)
         {
             //Containers
             { ".bin",  typeof(BIN) },
@@ -76,7 +76,7 @@ namespace PersonaEditorLib
 
         private static readonly Dictionary<Type, Func<string, byte[], IGameData>> _factories = new Dictionary<Type, Func<string, byte[], IGameData>>
         {
-            { typeof(BIN),      (name, data) => name.ToLower().EndsWith(".cpk") ? new BIN(data, true) : new BIN(data, false) },
+            { typeof(BIN),      (name, data) => name.EndsWith(".cpk", StringComparison.InvariantCultureIgnoreCase) ? new BIN(data, true) : new BIN(data, false) },
             { typeof(SPR),      (name, data) => new SPR(data) },
             { typeof(TMX),      (name, data) => new TMX(data) },
             { typeof(BF),       (name, data) => new BF(data, name) },
@@ -151,7 +151,7 @@ namespace PersonaEditorLib
 
         public static Type TryGetDataType(string name)
         {
-            string ext = Path.GetExtension(name).ToLower().TrimEnd(' ');
+            string ext = Path.GetExtension(name).TrimEnd();
             if (_extensionToType.TryGetValue(ext, out var type))
                 return type;
 

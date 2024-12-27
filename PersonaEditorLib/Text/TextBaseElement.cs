@@ -33,9 +33,9 @@ namespace PersonaEditorLib.Text
 
             if (Data.Length > 0)
             {
-                returned += "{" + Convert.ToString(Data[0], 16).PadLeft(2, '0').ToUpper();
+                returned += "{" + Convert.ToString(Data[0], 16).PadLeft(2, '0').ToUpperInvariant();
                 for (int i = 1; i < Data.Length; i++)
-                    returned += " " + Convert.ToString(Data[i], 16).PadLeft(2, '0').ToUpper();
+                    returned += " " + Convert.ToString(Data[i], 16).PadLeft(2, '0').ToUpperInvariant();
 
                 returned += "}";
             }

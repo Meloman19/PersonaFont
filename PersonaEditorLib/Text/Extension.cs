@@ -237,10 +237,10 @@ namespace PersonaEditorLib.Text
                 byte[] temp = Bytes.Data.ToArray();
                 if (temp.Length > 0)
                 {
-                    returned += "{" + System.Convert.ToString(temp[0], 16).PadLeft(2, '0').ToUpper();
+                    returned += "{" + System.Convert.ToString(temp[0], 16).PadLeft(2, '0').ToUpperInvariant();
                     for (int i = 1; i < temp.Length; i++)
                     {
-                        returned += "\u00A0" + System.Convert.ToString(temp[i], 16).PadLeft(2, '0').ToUpper();
+                        returned += "\u00A0" + System.Convert.ToString(temp[i], 16).PadLeft(2, '0').ToUpperInvariant();
                     }
                     returned += "} ";
                 }
