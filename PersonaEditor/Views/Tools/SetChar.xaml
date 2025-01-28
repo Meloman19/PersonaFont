@@ -11,7 +11,7 @@
     <i:Interaction.Behaviors>
         <beh:ClosingWindowBehavior Closing="{Binding Closing}" />
     </i:Interaction.Behaviors>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -20,6 +20,7 @@
 
         <StatusBar>
             <ComboBox Width="100" ItemsSource="{Binding FontList}" SelectedIndex="{Binding FontSelect}"/>
+            <Button Content="Open in Text Editor" Command="{Binding ExternalEdit}"/>
         </StatusBar>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">

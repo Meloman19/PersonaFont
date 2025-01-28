@@ -10,6 +10,9 @@ using System.Windows.Media.Imaging;
 using PersonaEditor.Common;
 using AuxiliaryLibraries.Media;
 using AuxiliaryLibraries.WPF.Wrapper;
+using System;
+using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace PersonaEditor.ViewModels.Tools
 {
@@ -58,6 +61,7 @@ namespace PersonaEditor.ViewModels.Tools
         {
             Closing = new RelayCommand(Window_Closing);
             GlyphList.ListChanged += GlyphList_ListChanged;
+            ExternalEdit = new RelayCommand(ExternalEdit_Click);
         }
 
         private void GlyphList_ListChanged(object sender, ListChangedEventArgs e)
@@ -93,11 +97,102 @@ namespace PersonaEditor.ViewModels.Tools
             GlyphList.ListChanged += GlyphList_ListChanged;
         }
 
+        public ICommand ExternalEdit { get; }
+
+        public void ExternalEdit_Click()
+        {
+            var enc = Static.EncodingManager.GetPersonaEncoding(Static.FontManager.GetPersonaFontName(_FontSelect));
+
+            if (enc.Tag != "")
+            {
+                string[] charList = new string[GlyphList.Last().Index + 1];
+                for (int i = 0; i < 32; i++)
+                    charList[i] = "\\u" + i.ToString("x4");
+                foreach (var a in GlyphList)
+                    charList[a.Index] = a.Char;
+
+                // Create tsv file
+                var path = Path.Combine(Static.Paths.DirFont, enc.Tag + ".tsv");
+                using (var file = File.Create(path))
+                {
+                    using (var writer = new StreamWriter(file))
+                    {
+                        for (int i = 0; i < charList.Length; i++)
+                        {
+                            writer.Write(charList[i]);
+                            if (i % 16 == 15)
+                                writer.WriteLine();
+                            else if (i != charList.Length - 1)
+                                writer.Write('\t');
+                        }
+                    }
+                }
+
+                // Open tsv file on external editor
+                ProcessStartInfo psi = new ProcessStartInfo(path);
+                psi.UseShellExecute = true;
+                Process.Start(psi);
+
+                var result = MessageBox.Show("Load file changes from external tsv file?", "Open in External Editor", MessageBoxButton.YesNo);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    var modifications = new List<(int, string)>();
+
+                    // Read tsv file
+                    using (var file = File.OpenRead(path))
+                    {
+                        using (var reader = new StreamReader(file))
+                        {
+                            int i = 0;
+                            while (!reader.EndOfStream)
+                            {
+                                var line = reader.ReadLine();
+                                var chars = line.Split('\t');
+                                foreach (var a in chars)
+                                {
+                                    if (charList[i] != a)
+                                        modifications.Add((i, a));
+                                    i++;
+                                    if (i >= charList.Length)
+                                        break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (modifications.Count == 0)
+                    {
+                        MessageBox.Show("No changes found.", "Open in External Editor", MessageBoxButton.OK);
+                        return;
+                    }
+
+                    // Confirm changes
+                    string confirmMessage = "Confirm following " + modifications.Count + " change(s)?";
+                    for (int i = 0; i < Math.Min(modifications.Count, 10); i++)
+                    {
+                        confirmMessage += "\n[" + modifications[i].Item1 + "] \"" + charList[modifications[i].Item1] + "\" -> \"" + modifications[i].Item2 + "\"";
+                    }
+                    if (modifications.Count > 10)
+                        confirmMessage += "\n...";
+                    var confirmResult = MessageBox.Show(confirmMessage, "Open in External Editor", MessageBoxButton.YesNo);
+
+                    if (confirmResult == MessageBoxResult.Yes)
+                    {
+                        foreach (var a in modifications)
+                        {
+                            GlyphList[a.Item1 - 32].Char = a.Item2;
+                        }
+                    }
+                }
+            }
+        }
+
         bool Save()
         {
             if (IsChanged)
             {
-                var result = MessageBox.Show("Save changed?", "Save", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes);
+                var result = MessageBox.Show("Save changes?", "Save", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes);
 
                 if (result == MessageBoxResult.Yes)
                 {
